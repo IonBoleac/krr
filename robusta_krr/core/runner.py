@@ -352,7 +352,10 @@ class Runner:
                 # NOTE: Kubernetes API returned pods, but Prometheus did not
                 # This might happen with fast executing jobs, or with metrics services
                 # that don't provide kube-state-metrics (e.g., GCP Anthos)
-                if object.pods != []:
+                if (
+                    object.pods != []
+                    and getattr(prometheus_loader, "prometheus_pod_discovery_supported", True)
+                ):
                     object.add_warning("NoPrometheusPods")
                     logger.debug(
                         f"Using Kubernetes API for pod discovery for {object} "
@@ -466,6 +469,13 @@ class Runner:
         if len(scans) == 0:
             logger.warning("Current filters resulted in no objects available to scan.")
             logger.warning("Try to change the filters or check if there is anything available.")
+            logger.warning(
+                "Active filters -> clusters: %s, namespaces: %s, resources: %s, selector: %s",
+                clusters if clusters is not None else "in-cluster",
+                settings.namespaces,
+                settings.resources,
+                settings.selector or "<none>",
+            )
             if settings.namespaces == "*":
                 logger.warning(
                     "Note that you are using the '*' namespace filter, which by default excludes kube-system."

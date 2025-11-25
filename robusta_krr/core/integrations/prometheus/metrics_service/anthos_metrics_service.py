@@ -41,6 +41,12 @@ class AnthosMetricsService(GcpManagedPrometheusMetricsService):
     - Memory aggregation: max_over_time instead of max_over_time
     """
 
+    prometheus_pod_discovery_supported = False
+
+    @classmethod
+    def name(cls) -> str:
+        return "GCP Anthos Managed Prometheus"
+
     # Loader mapping for Anthos metrics
     LOADER_MAPPING: Dict[str, Optional[type[PrometheusMetric]]] = {
         "CPULoader": AnthosCPULoader,
@@ -70,6 +76,7 @@ class AnthosMetricsService(GcpManagedPrometheusMetricsService):
         """
         logger.info("Initializing Anthos Metrics Service for on-prem Kubernetes managed by GCP")
         super().__init__(cluster=cluster, api_client=api_client, executor=executor)
+        logger.info("Using Anthos metric naming: kubernetes.io/anthos/container/*")
 
     async def get_cluster_summary(self) -> Dict[str, Any]:
         """

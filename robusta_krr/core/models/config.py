@@ -50,6 +50,7 @@ class Config(pd.BaseSettings):
     coralogix_token: Optional[pd.SecretStr] = pd.Field(None)
     openshift: bool = pd.Field(False)
     gcp_anthos: bool = pd.Field(False, description="Use Anthos metrics (kubernetes.io/anthos/*) instead of GKE metrics")
+    gcp_managed_prom: bool = pd.Field(False, description="Force using GCP Managed Prometheus metric loaders")
 
     # Threading settings
     max_workers: int = pd.Field(6, ge=1)

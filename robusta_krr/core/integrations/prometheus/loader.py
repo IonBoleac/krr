@@ -25,6 +25,11 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger("krr")
 
+GCP_MANAGED_PROM_KEYWORDS = (
+    "monitoring.googleapis.com",
+    "managedprometheus.googleapis.com",
+)
+
 class PrometheusMetricsLoader:
     def __init__(self, *, cluster: Optional[str] = None) -> None:
         """
@@ -53,17 +58,25 @@ class PrometheusMetricsLoader:
         api_client: Optional[ApiClient] = None,
         cluster: Optional[str] = None,
     ) -> Optional[PrometheusMetricsService]:
+        def is_gcp_managed_prom() -> bool:
+            if settings.gcp_managed_prom or settings.gcp_anthos:
+                return True
+
+            if not settings.prometheus_url:
+                return False
+
+            return any(keyword in settings.prometheus_url for keyword in GCP_MANAGED_PROM_KEYWORDS)
+
         if settings.prometheus_url is not None:
             logger.info("Prometheus URL is specified, will not auto-detect a metrics service")
             
             # Check if the URL is for GCP Managed Prometheus
-            if "monitoring.googleapis.com" in settings.prometheus_url:
-                # Check if Anthos mode is explicitly enabled
+            if is_gcp_managed_prom():
                 if settings.gcp_anthos:
                     logger.info("GCP Anthos mode enabled, using Anthos-specific service")
                     metrics_to_check = [AnthosMetricsService]
                 else:
-                    logger.info("Detected GCP Managed Prometheus URL, using GCP-specific service")
+                    logger.info("Using GCP Managed Prometheus service")
                     metrics_to_check = [GcpManagedPrometheusMetricsService]
             else:
                 metrics_to_check = [PrometheusMetricsService]

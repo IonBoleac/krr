@@ -82,10 +82,14 @@ class GcpManagedPrometheusMetricsService(PrometheusMetricsService):
         api_client: Optional[ApiClient] = None,
         executor: Optional[ThreadPoolExecutor] = None,
     ) -> None:
-        logger.info("Initializing GCP Managed Prometheus metrics service")
+        logger.info(f"Initializing {self.name()} metrics service")
         super().__init__(cluster=cluster, api_client=api_client, executor=executor)
-        logger.info(f"GCP Managed Prometheus service initialized for cluster {cluster or 'default'}")
-        logger.info(f"Using GCP metric naming: kubernetes.io/container/cpu/core_usage_time and kubernetes.io/container/memory/used_bytes")
+        logger.info(f"{self.name()} service initialized for cluster {cluster or 'default'}")
+        if type(self) is GcpManagedPrometheusMetricsService:
+            logger.info(
+                "Using GCP metric naming: kubernetes.io/container/cpu/core_usage_time and "
+                "kubernetes.io/container/memory/used_bytes"
+            )
 
     def check_connection(self):
         """

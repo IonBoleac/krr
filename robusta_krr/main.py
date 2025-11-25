@@ -207,6 +207,12 @@ def load_commands() -> None:
                     help="Use GCP Anthos metrics (kubernetes.io/anthos/*) for on-prem Kubernetes managed by Google",
                     rich_help_panel="Prometheus GCP Settings",
                 ),
+                gcp_managed_prom: bool = typer.Option(
+                    False,
+                    "--gcp-managed-prom",
+                    help="Force KRR to use the GCP Managed Prometheus metric loaders (even with custom domains)",
+                    rich_help_panel="Prometheus GCP Settings",
+                ),
                 cpu_min_value: int = typer.Option(
                     10,
                     "--cpu-min",
@@ -387,6 +393,7 @@ def load_commands() -> None:
                         coralogix_token=coralogix_token,
                         openshift=openshift,
                         gcp_anthos=gcp_anthos,
+                        gcp_managed_prom=gcp_managed_prom,
                         max_workers=max_workers,
                         job_grouping_labels=job_grouping_labels,
                         job_grouping_limit=job_grouping_limit,

@@ -58,6 +58,7 @@ class PrometheusMetricsService(MetricsService):
     service_discovery: type[MetricsServiceDiscovery] = PrometheusDiscovery
     url_postfix: str = ""
     additional_headers: dict[str, str] = {}
+    prometheus_pod_discovery_supported: bool = True
 
     def __init__(
         self,
